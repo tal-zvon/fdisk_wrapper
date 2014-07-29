@@ -1,0 +1,48 @@
+#!/bin/bash
+FDISK_PATH=/sbin/fdisk
+DEVICES_TO_SKIP='/dev/sda /dev/sdb'
+
+[[ -e $FDISK_PATH ]] ||
+{ echo "$FDISK_PATH is not a valid path to fdisk. Modify $0 with the correct path."; exit 1; }
+
+#Remind user that they are not running fdisk directly
+echo "Running fdisk wrapper script"
+
+#If this script was run with any arguments other than "-l", pass the arguments
+#to real fdisk
+if [[ $# -ne 1 ]] || [[ $1 != "-l" ]]
+then
+	#echo "Passing '$@' to $FDISK_PATH"
+	$FDISK_PATH $@
+else
+	which lsblk &>/dev/null ||
+	{ echo "WARNING: lsblk is required, but was not detected. Running regular fdisk"; $FDISK_PATH -l; exit 1; }
+
+	#Remind user that we are ignoring some disks
+	echo -n "Ignoring disks: "
+	echo $DEVICES_TO_SKIP | sed 's/ /, /g'
+
+	#echo "Run fdisk only on devices we are not ignoring"
+	IFS=$'\n'
+	for DEVICE in $(lsblk -o KNAME,TYPE | grep disk)
+	do
+		DEVICE="/dev/$DEVICE"
+		DEVICE=$(echo $DEVICE | cut -d ' ' -f 1)
+		SKIP=false
+
+		IFS=' '
+		for D in $DEVICES_TO_SKIP
+		do
+			if [[ $D == $DEVICE ]]
+			then
+				SKIP=true
+				break
+			fi
+		done
+
+		if ! $SKIP
+		then
+			$FDISK_PATH -l $DEVICE
+		fi
+	done
+fi
