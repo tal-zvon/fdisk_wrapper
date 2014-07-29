@@ -26,7 +26,7 @@ else
 
 	#echo "Run fdisk only on devices we are not ignoring"
 	IFS=$'\n'
-	for DEVICE in $(lsblk -o KNAME,TYPE | grep 'disk$\|loop$\|dmraid$')
+	for DEVICE in $(lsblk -o KNAME,TYPE | grep 'disk$\|loop$\|dmraid$' | sort -u)
 	do
 		DEVICE="/dev/$DEVICE"
 		DEVICE=$(echo $DEVICE | cut -d ' ' -f 1)

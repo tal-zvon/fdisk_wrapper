@@ -21,7 +21,7 @@ FDISK_PATH=$(which fdisk)
 
 clear
 echo -e "Available devices: \n"
-for DEVICE in $(lsblk -o KNAME,TYPE | grep disk | cut -d ' ' -f 1)
+for DEVICE in $(lsblk -o KNAME,TYPE | grep 'disk$\|loop$\|dmraid$' | cut -d ' ' -f 1 | sort -u)
 do
 	echo /dev/$DEVICE
 done
