@@ -1,6 +1,7 @@
 #!/bin/bash
 FDISK_PATH=''
 DEVICES_TO_SKIP=''
+SCRIPT_DIR=$(dirname $(readlink -f $0))
 
 trap 'echo; exit 1' SIGINT
 
@@ -13,7 +14,7 @@ uid=$(/usr/bin/id -u) && [ "$uid" = "0" ] ||
 { echo 'the fdisk wrapper script is already installed'; exit 1; }
 
 #Check if fdisk is in current directory
-[[ -e $(echo "$(dirname $(readlink -f $0))/fdisk") ]] ||
+[[ -e $SCRIPT_DIR/fdisk ]] ||
 { echo "'fdisk' not found in current directory"; exit 1; }
 
 #Check if lsblk is installed
@@ -31,16 +32,16 @@ do
 done
 echo
 echo -n "Which devices would you like fdisk to ignore when you run "fdisk -l"? (eg: /dev/sda, /dev/sdf): "
-read -e DEVICES
+read -e DEVICES_TO_SKIP
 
 #Remove commas in the input
-DEVICES=$(echo $DEVICES | sed 's/,//g')
+DEVICES_TO_SKIP=$(echo $DEVICES_TO_SKIP | sed 's/,//g')
 
 #Check for invalid input
 
 ERROR=false
 
-for DEVICE in $DEVICES
+for DEVICE in $DEVICES_TO_SKIP
 do
 	#Check if the device file exists
 	[[ -e $DEVICE ]] ||
@@ -54,4 +55,15 @@ done
 #If there were errors, exit
 $ERROR && exit 1
 
-echo stuff
+#Copy fdisk to /usr/local/bin/
+echo
+cp -v $SCRIPT_DIR/fdisk /usr/local/bin/ &&
+chown -v root:root /usr/local/bin/fdisk &&
+chmod -v 755 /usr/local/bin/fdisk ||
+{ echo "Failed to install fdisk to /usr/local/bin/"; [[ -e /usr/local/bin/fdisk ]] && rm -f /usr/local/bin/fdisk exit 1; }
+
+#Modify fdisk's FDISK_PATH
+sed -i "s#^FDISK_PATH.*#FDISK_PATH=$FDISK_PATH#g" /usr/local/bin/fdisk
+
+#Modify fdisk's DEVICES_TO_SKIP
+sed -i "s#^DEVICES_TO_SKIP.*#DEVICES_TO_SKIP='$DEVICES_TO_SKIP'#g" /usr/local/bin/fdisk
