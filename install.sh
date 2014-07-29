@@ -12,6 +12,10 @@ uid=$(/usr/bin/id -u) && [ "$uid" = "0" ] ||
 [[ -e /usr/local/bin/fdisk ]] &&
 { echo 'the fdisk wrapper script is already installed'; exit 1; }
 
+#Check if fdisk is in current directory
+[[ -e $(echo "$(dirname $(readlink -f $0))/fdisk") ]] ||
+{ echo "'fdisk' not found in current directory"; exit 1; }
+
 #Check if lsblk is installed
 which lsblk &>/dev/null ||
 { echo 'lsblk is required, but was not detected.'; exit 1; }
@@ -29,15 +33,15 @@ echo
 echo -n "Which devices would you like fdisk to ignore when you run "fdisk -l"? (eg: /dev/sda, /dev/sdf): "
 read -e DEVICES
 
+#Remove commas in the input
+DEVICES=$(echo $DEVICES | sed 's/,//g')
+
 #Check for invalid input
 
 ERROR=false
 
 for DEVICE in $DEVICES
 do
-	#Ignore commas in the input
-	DEVICE=$(echo $DEVICE | sed 's/,$//g')
-
 	#Check if the device file exists
 	[[ -e $DEVICE ]] ||
 	{ echo "'$DEVICE' does not exist"; ERROR=true; continue; }
