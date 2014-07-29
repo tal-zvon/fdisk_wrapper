@@ -1,6 +1,8 @@
 #!/bin/bash
 FDISK_PATH=/sbin/fdisk
-DEVICES_TO_SKIP='/dev/sda /dev/sdb'
+#Comma seporated list of devices. Ex:
+#DEVICES_TO_SKIP='/dev/sda /dev/sdb'
+DEVICES_TO_SKIP=''
 
 [[ -e $FDISK_PATH ]] ||
 { echo "$FDISK_PATH is not a valid path to fdisk. Modify $0 with the correct path."; exit 1; }
@@ -24,7 +26,7 @@ else
 
 	#echo "Run fdisk only on devices we are not ignoring"
 	IFS=$'\n'
-	for DEVICE in $(lsblk -o KNAME,TYPE | grep disk)
+	for DEVICE in $(lsblk -o KNAME,TYPE | grep 'disk$\|loop$\|dmraid$')
 	do
 		DEVICE="/dev/$DEVICE"
 		DEVICE=$(echo $DEVICE | cut -d ' ' -f 1)
