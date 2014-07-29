@@ -33,26 +33,18 @@ read -e DEVICES
 
 ERROR=false
 
-INVALID_INPUT=$(echo $DEVICES | tr ' ' '\n' | grep -v '^/dev/' | tr '\n' ' ' | sed 's/ $//g')
-if [[ -n $INVALID_INPUT ]]
-then
-	if [[ $(echo $INVALID_INPUT | grep -o ' ' | wc -c) -eq 0 ]]
-	then
-		echo "'$INVALID_INPUT' does not exist"
-		ERROR=true
-	else
-		echo "'$INVALID_INPUT' do not exist"
-		ERROR=true
-	fi
-fi
-
-DEVICES=$(echo $DEVICES | grep -o '/dev/[-_a-Z0-9/]*')
-
 for DEVICE in $DEVICES
 do
+	#Ignore commas in the input
+	DEVICE=$(echo $DEVICE | sed 's/,$//g')
+
+	#Check if the device file exists
+	[[ -e $DEVICE ]] ||
+	{ echo "'$DEVICE' does not exist"; ERROR=true; continue; }
+
 	#Check if device is a valid block device
 	[[ -b $DEVICE ]] || 
-	{ echo "'$DEVICE' is not a valid block device"; ERROR=true; }
+	{ echo "'$DEVICE' is not a valid block device"; ERROR=true; continue; }
 done
 
 #If there were errors, exit
