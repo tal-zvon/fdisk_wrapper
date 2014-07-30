@@ -63,7 +63,12 @@ chmod -v 755 /usr/local/bin/fdisk ||
 { echo "Failed to install fdisk to /usr/local/bin/"; [[ -e /usr/local/bin/fdisk ]] && rm -f /usr/local/bin/fdisk exit 1; }
 
 #Modify fdisk's FDISK_PATH
-sed -i "s#^FDISK_PATH.*#FDISK_PATH=$FDISK_PATH#g" /usr/local/bin/fdisk
+sed -i "s#^FDISK_PATH.*#FDISK_PATH=$FDISK_PATH#g" /usr/local/bin/fdisk ||
+echo "Failed to set FDISK_PATH variable on /usr/local/bin/fdisk"
 
 #Modify fdisk's DEVICES_TO_SKIP
-sed -i "s#^DEVICES_TO_SKIP.*#DEVICES_TO_SKIP='$DEVICES_TO_SKIP'#g" /usr/local/bin/fdisk
+sed -i "s#^DEVICES_TO_SKIP.*#DEVICES_TO_SKIP='$DEVICES_TO_SKIP'#g" /usr/local/bin/fdisk ||
+echo "Failed to set DEVICES_TO_SKIP variable on /usr/local/bin/fdisk"
+
+#Write that everything is done successfully
+echo "fdisk installed successfully"
