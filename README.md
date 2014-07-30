@@ -13,3 +13,7 @@ Requirements:
 Install:
 
 	Run install.sh as root
+
+Uninstall:
+
+	Delete /usr/local/bin/fdisk
