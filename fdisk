@@ -21,7 +21,7 @@ else
 
 	#Remind user that we are ignoring some disks
 	echo -n "Ignoring disks: "
-	echo $DEVICES_TO_SKIP | sed 's/ /, /g'
+	[[ -z $DEVICES_TO_SKIP ]] && echo None || echo $DEVICES_TO_SKIP | sed 's/ /, /g'
 
 	#Run fdisk -l on all devices that are not on the ignore list
 	IFS=$'\n'
