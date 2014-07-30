@@ -14,7 +14,6 @@ echo "Running fdisk wrapper script"
 #to real fdisk
 if [[ $# -ne 1 ]] || [[ $1 != "-l" ]]
 then
-	#echo "Passing '$@' to $FDISK_PATH"
 	$FDISK_PATH $@
 else
 	which lsblk &>/dev/null ||
@@ -24,7 +23,7 @@ else
 	echo -n "Ignoring disks: "
 	echo $DEVICES_TO_SKIP | sed 's/ /, /g'
 
-	#echo "Run fdisk only on devices we are not ignoring"
+	#Run fdisk -l on all devices that are not on the ignore list
 	IFS=$'\n'
 	for DEVICE in $(lsblk -o KNAME,TYPE | grep 'disk$\|loop$\|dmraid$' | sort -u)
 	do
