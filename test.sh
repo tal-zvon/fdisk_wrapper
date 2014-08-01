@@ -2,9 +2,6 @@
 
 FDISK_PATH=/sbin/fdisk
 
-#Sets itself to 'true' if 'dmsetup' is found, or 'false' if it's not
-#DMSETUP_PRESENT=$(which dmsetup &>/dev/null && echo true || echo false)
-
 #There are several cases where fdisk runs against partitions, rather than
 #disks. This script makes sure that this does NOT happen. The result is that
 #this script's output may be slightly different than real fdisk's output. If you
@@ -59,8 +56,7 @@ do
 	fi
 
 	#If $DEVICE is a PARTITION on a loop device, ignore it.
-	#Real fdisk doesn't do this - comment this section out if you want
-	#	your stdout to look exactly like real fdisk's
+	#Real fdisk doesn't do this check
 	$IMITATE_FDISK ||
 	if echo $DEVICE | grep -q '^/dev/mapper/loop[0-9]'
 	then
@@ -69,8 +65,7 @@ do
 
 	#If $DEVICE is a logical volume, ignore it. It's basically like running
 	#fdisk on a partition
-	#Real fdisk doesn't do this - comment this section out if you want
-	#	your stdout to look exactly like real fdisk's
+	#Real fdisk doesn't do this check
 	#Note: We don't explicitly check for existence of 'lvdisplay' on the system
 	#	because if it doesn't, the command below will quietly fail anyway,
 	#	and we only care if it succeeds
@@ -81,8 +76,7 @@ do
 	fi
 
 	#If $DEVICE ends in #p#, it's a partition, so ignore it.
-	#Real fdisk doesn't do this - comment this section out if you want
-	#	your stdout to look exactly like real fdisk's
+	#Real fdisk doesn't do this check
 	$IMITATE_FDISK ||
 	if echo $DEVICE | grep -q '[0-9]p[0-9][0-9]*'
 	then
