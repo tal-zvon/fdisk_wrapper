@@ -1,12 +1,14 @@
 #!/bin/bash
-FDISK_PATH=''
+FDISK_PATH=$(which fdisk)
 DEVICES_TO_SKIP=''
 SCRIPT_DIR=$(dirname $(readlink -f $0))
 
-#Controls whether the fdisk wrapper sript tries to immitate fdisk's output
+#Controls whether the fdisk wrapper script tries to immitate fdisk's output
 #or be smarter
 IMITATE_FDISK=false
 
+#If user hits Ctrl+C, write a new line before
+#exiting, or else it just looks weird
 trap 'echo; exit 1' SIGINT
 
 #Only run if user is root
@@ -20,8 +22,6 @@ uid=$(/usr/bin/id -u) && [ "$uid" = "0" ] ||
 #Check if fdisk is in current directory
 [[ -e $SCRIPT_DIR/fdisk ]] ||
 { echo "'fdisk' not found in current directory"; exit 1; }
-
-FDISK_PATH=$(which fdisk)
 
 get_list_of_devices(){
         for DEVICE in $(cat /proc/partitions  | tail -n+3 | tr -s ' ' | cut -d ' ' -f 5)
@@ -98,7 +98,6 @@ get_list_of_devices(){
                         continue
                 fi
 
-                #/sbin/fdisk -l $DEVICE
                 echo $DEVICE
         done
 }
@@ -201,14 +200,24 @@ echo "Failed to set DEVICES_TO_SKIP variable on /usr/local/bin/fdisk"
 
 #Modify fdisk's IMITATE_FDISK (only if it's 'true', since 'false' is the default)
 $IMITATE_FDISK &&
-sed -i "s#^IMITATE_FDISK.*#IMITATE_FDISK=true#g" /usr/local/bin/fdisk ||
-echo "Failed to set IMITATE_FDISK variable on /usr/local/bin/fdisk"
+{
+	sed -i "s#^IMITATE_FDISK.*#IMITATE_FDISK=true#g" /usr/local/bin/fdisk ||
+	echo "Failed to set IMITATE_FDISK variable on /usr/local/bin/fdisk"
+}
+
+#Check if root's $PATH contains /usr/local/bin
+echo $PATH | grep -q '/usr/local/bin' ||
+{
+	echo "WARNING: /usr/local/bin is NOT in your root's \$PATH"
+	echo -e "\tThis is bad if you plan to run fdisk directly as root (without sudo)"
+	echo -e "\t/usr/local/bin must be added ahead of $(dirname $FDISK_PATH)"
+}
 
 #Check if sudo is going to be a problem
 sudo bash -c 'echo $PATH' | grep -q '/usr/local/bin' ||
 {
 	echo "WARNING: /usr/local/bin is NOT in your sudo's \$PATH"
-	echo -e "\tThis is only bad if you plan to run fdisk using sudo"
+	echo -e "\tThis is bad if you plan to run fdisk using sudo"
 	echo -e "\tSee secure_path of /etc/sudoers to set sudo's \$PATH"
 	echo -e "\t/usr/local/bin must be added ahead of $(dirname $FDISK_PATH)"
 }
