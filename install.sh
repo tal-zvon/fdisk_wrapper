@@ -42,6 +42,12 @@ get_list_of_devices(){
                         continue
                 fi
 
+                #Ignore floppy disks
+                if echo $DEVICE | grep -q '^/dev/fd'
+                then
+                        continue
+                fi
+
                 #Should we try to act like fdisk when it's something dumb, or try to
                 #do better?
                 if $IMITATE_FDISK
