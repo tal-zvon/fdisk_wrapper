@@ -96,7 +96,6 @@ get_list_of_devices(){
 			continue
 		fi
 
-		#/sbin/fdisk -l $DEVICE
 		echo $DEVICE
 	done
 }
