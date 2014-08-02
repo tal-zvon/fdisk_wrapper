@@ -131,6 +131,12 @@ else
 	do
 		SKIP=false
 
+		#Real fdisk ignores devices that it has no permissions to read
+		$IMITATE_FDISK &&
+		{
+			[[ -r $DEVICE ]] || continue
+		}
+
 		IFS=' '
 		for D in $DEVICES_TO_SKIP
 		do
