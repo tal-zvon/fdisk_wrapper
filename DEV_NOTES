@@ -1,3 +1,9 @@
+since bash hashes executables when you run them, if you open a new terminal, run 'fdisk -l' (letting bash hash it), and 
+	then run 'sudo ./install.sh', after the install is done, "sudo fdisk" will still run /sbin/fdisk. This can easily
+	be fixed outside the script using "hash -r" or "hash -d fdisk", BUT this CANNOT be done from within install.sh
+	because scripts run in a different environment than the one that ran them.
+	See: http://unix.stackexchange.com/a/5610
+
 Add code that exits the fdisk wrapper script with the same exit code as real fdisk
 Check if fdisk's stderr still gets written to stderr through my script
 Check how LVM logical volumes get handled
