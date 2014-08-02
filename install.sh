@@ -226,18 +226,10 @@ $IMITATE_FDISK &&
 	echo "Failed to set IMITATE_FDISK variable on /usr/local/bin/fdisk"
 }
 
-#Check if root's $PATH contains /usr/local/bin
-echo $PATH | grep -q '/usr/local/bin' ||
-{
-	echo "WARNING: /usr/local/bin is NOT in your root's \$PATH"
-	echo -e "\tThis is bad if you plan to run fdisk directly as root (without sudo)"
-	echo -e "\t/usr/local/bin must be added ahead of $(dirname $FDISK_PATH)"
-}
-
-#Check if sudo is going to be a problem
-#but only if 'sudo' is found on the system
-which sudo &>/dev/null &&
-{
+#Check if sudo is on the system
+if which sudo &>/dev/null
+then
+	#Check if sudo's $PATH contains /usr/local/bin
 	sudo bash -c 'echo $PATH' | grep -q '/usr/local/bin' ||
 	{
 		echo "WARNING: /usr/local/bin is NOT in your sudo's \$PATH"
@@ -245,7 +237,24 @@ which sudo &>/dev/null &&
 		echo -e "\tSee secure_path of /etc/sudoers to set sudo's \$PATH"
 		echo -e "\t/usr/local/bin must be added ahead of $(dirname $FDISK_PATH)"
 	}
-}
+
+	#Check if root's $PATH contains /usr/local/bin
+	#sudo -i bash -c 'echo $PATH' | grep -q '/usr/local/bin' ||
+	su - -c 'echo $PATH' | grep -q '/usr/local/bin' ||
+	{
+		echo "WARNING: /usr/local/bin is NOT in your root's \$PATH"
+		echo -e "\tThis is bad if you plan to run fdisk directly as root (without sudo)"
+		echo -e "\t/usr/local/bin must be added ahead of $(dirname $FDISK_PATH)"
+	}
+else
+	#Check if root's $PATH contains /usr/local/bin
+	echo $PATH | grep -q '/usr/local/bin' ||
+	{
+		echo "WARNING: /usr/local/bin is NOT in your root's \$PATH"
+		echo -e "\tThis is bad if you plan to run fdisk directly as root (without sudo)"
+		echo -e "\t/usr/local/bin must be added ahead of $(dirname $FDISK_PATH)"
+	}
+fi
 
 #Write that everything is done successfully
 echo "fdisk installed successfully"
