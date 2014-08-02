@@ -13,7 +13,7 @@ trap 'echo; exit 1' SIGINT
 
 #Only run if user is root
 uid=$(/usr/bin/id -u) && [ "$uid" = "0" ] ||
-{ echo "You must be root to run $0. Try again with the command 'sudo $0'" | fmt -w `tput cols`; exit 1; }
+{ echo "You must be root to run $0."; echo "Try again with the command 'sudo $0'"; exit 1; }
 
 #Check if wrapper script is already installed
 [[ -e /usr/local/bin/fdisk ]] &&
@@ -109,9 +109,15 @@ get_list_of_devices(){
 }
 
 clear
-echo "There are several cases where fdisk runs against partitions, rather than disks, which shows mostly useless output and clutters up your terminal. This script adds some additional checks to make sure that this does NOT happen. The result is that this script's output may be slightly different than real fdisk's output. Do you want the script to ignore these additional checks and act exactly like fdisk, even when fdisk is doing something dumb?" | fmt -w `tput cols`
+echo "There are several cases where fdisk runs against partitions, rather than disks,
+which shows mostly useless output and clutters up your terminal. This script
+adds some additional checks to make sure that this does NOT happen. The result
+is that this script's output may be slightly different than real fdisk's
+output. Do you want the script to ignore these additional checks and act
+exactly like fdisk, even when fdisk is doing something dumb?"
 echo
-echo "Hint: Only say 'yes' if you understand the question, and have a good reason to do this" | fmt -w `tput cols`
+echo "Hint: Only say 'yes' if you understand the question, and have a good
+reason to do this"
 echo -n "Your answer [y/N]: "
 read answer
 
@@ -147,7 +153,8 @@ do
 	echo $DEVICE
 done
 echo
-echo "Which devices would you like fdisk to ignore when you run "fdisk -l"? (eg: '/dev/sda, /dev/sdf')" | fmt -w `tput cols`
+echo "Which devices would you like fdisk to ignore when you run 'fdisk -l'?"
+echo "(eg: '/dev/sda, /dev/sdf')"
 echo -n "Your answer: "
 read -e DEVICES_TO_SKIP
 
