@@ -1,0 +1,15 @@
+Add code that exits the fdisk wrapper script with the same exit code as real fdisk
+Check if fdisk's stderr still gets written to stderr through my script
+Check how LVM logical volumes get handled
+	In imitate_fdisk mode - is it the same as regular fdisk?
+	In non imitate_fdisk mode - can I have it only show lvm disks if fdisk is new enough to handle LVM?
+Test code on:
+	CentOS
+	Debian
+	Alpine
+My "check if loop device looks like it has a partition table" code in install.sh applies to all types of disks - not just loop devices, which is bad
+	Fix it
+	Test fix in a VM
+Add instructions for installing fdisk script manually in cases where install.sh fails
+	Ex. Embeded systems without tools like fmt, tput, and other small programs I don't test for
+Go over all the code before I merge into master
