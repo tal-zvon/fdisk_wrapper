@@ -227,12 +227,16 @@ echo $PATH | grep -q '/usr/local/bin' ||
 }
 
 #Check if sudo is going to be a problem
-sudo bash -c 'echo $PATH' | grep -q '/usr/local/bin' ||
+#but only if 'sudo' is found on the system
+which sudo &>/dev/null &&
 {
-	echo "WARNING: /usr/local/bin is NOT in your sudo's \$PATH"
-	echo -e "\tThis is bad if you plan to run fdisk using sudo"
-	echo -e "\tSee secure_path of /etc/sudoers to set sudo's \$PATH"
-	echo -e "\t/usr/local/bin must be added ahead of $(dirname $FDISK_PATH)"
+	sudo bash -c 'echo $PATH' | grep -q '/usr/local/bin' ||
+	{
+		echo "WARNING: /usr/local/bin is NOT in your sudo's \$PATH"
+		echo -e "\tThis is bad if you plan to run fdisk using sudo"
+		echo -e "\tSee secure_path of /etc/sudoers to set sudo's \$PATH"
+		echo -e "\t/usr/local/bin must be added ahead of $(dirname $FDISK_PATH)"
+	}
 }
 
 #Write that everything is done successfully
