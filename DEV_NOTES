@@ -7,11 +7,6 @@ since bash hashes executables when you run them, if you open a new terminal, run
 The exit code of the fdisk wrapper script is the same as the last, non-zero exit code of the 'fdisk -l $DEVICE' command
 	If anyone has a better idea for an exit code for the fdisk wrapper script, let me know
 
-Test code on:
-	CentOS
-	Debian
-	Alpine
-
 Add instructions for installing fdisk script manually in cases where install.sh fails
 	Ex. Embeded systems without tools like fmt, tput, and other small programs I don't test for
 
