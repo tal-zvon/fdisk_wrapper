@@ -79,7 +79,7 @@ get_list_of_devices(){
 		#If $DEVICE ends in #p#, it's a partition, so ignore it.
 		#Real fdisk doesn't do this check
 		$IMITATE_FDISK ||
-		if echo $DEVICE | grep -q '[0-9]p[0-9][0-9]*'
+		if echo $DEVICE | grep -q '[0-9]p[0-9][0-9]*$'
 		then
 			continue
 		fi
