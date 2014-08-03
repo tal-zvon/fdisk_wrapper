@@ -19,12 +19,13 @@ uid=$(/usr/bin/id -u) && [ "$uid" = "0" ] ||
 [[ -e /usr/local/bin/fdisk ]] &&
 { echo 'the fdisk wrapper script is already installed'; exit 1; }
 
-#Check if fdisk is in current directory
+#Check if fdisk is available in the same dir
+#as this install.sh script
 [[ -e $SCRIPT_DIR/fdisk ]] ||
 { echo "'fdisk' not found in current directory"; exit 1; }
 
 #Check if the LIB library is available in the same dir
-#as this install.sh script
+#as this install.sh script, and if it is, source it
 [[ -e $SCRIPT_DIR/LIB ]] && . $SCRIPT_DIR/LIB ||
 { echo "LIB library not found"; exit 1; }
 
@@ -34,11 +35,12 @@ uid=$(/usr/bin/id -u) && [ "$uid" = "0" ] ||
 
 clear
 echo "There are several cases where fdisk runs against partitions, rather than disks,
-which shows mostly useless output and clutters up your terminal. This script
-adds some additional checks to make sure that this does NOT happen. The result
-is that this script's output may be slightly different than real fdisk's
-output. Do you want the script to ignore these additional checks and act
-exactly like fdisk, even when fdisk is doing something dumb?"
+which shows mostly useless output and clutters up your terminal. The fdisk
+wrapper script adds some additional checks to make sure that this does NOT
+happen. The result is that the wrapper script's output may be slightly
+different than real fdisk's output. Do you want the wrapper script to disable
+these additional checks and act exactly like fdisk (except the partitions
+you've ignored), even when fdisk is doing something dumb?"
 echo
 echo "Hint: Only say 'yes' if you understand the question, and have a good
 reason to do this"
@@ -46,6 +48,7 @@ echo -n "Your answer [y/N]: "
 read answer
 
 #Convert answer to lowercase
+#Note: We keep $lanswer separate from $answer on purpose
 lanswer=$(echo $answer | tr "[:upper:]" "[:lower:]")
 
 #Default to no if variable is empty
@@ -78,7 +81,7 @@ do
 done
 echo
 echo "Which devices would you like fdisk to ignore when you run 'fdisk -l'?"
-echo "(eg: '/dev/sda, /dev/sdf')"
+echo "  Ex: '/dev/sda, /dev/sdf, /dev/mapper/vg0-lv_root'"
 echo -n "Your answer: "
 read -e DEVICES_TO_SKIP
 
