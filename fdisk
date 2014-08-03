@@ -46,15 +46,11 @@ get_list_of_devices(){
 			continue
 		fi
 
-		#Should we try to act like fdisk when it's something dumb, or try to
-		#do better?
-		if $IMITATE_FDISK
+		#Do what fdisk does - ignore loop devices directly under /dev
+		$IMITATE_FDISK &&
+		if echo $DEVICE | grep -q '^/dev/loop'
 		then
-			#Do what fdisk does - ignore loop devices directly under /dev
-			if echo $DEVICE | grep -q '^/dev/loop'
-			then
-				continue
-			fi
+			continue
 		fi
 
 		#If $DEVICE has a mapping under /dev/mapper (as determined by 'dmsetup'),
@@ -126,7 +122,6 @@ else
 
 	#Run fdisk -l on all devices that are not on the ignore list
 	IFS=$'\n'
-	#for DEVICE in $(lsblk -o KNAME,TYPE | grep 'disk$\|loop$\|dmraid$' | sort -u)
 	for DEVICE in $(get_list_of_devices)
 	do
 		SKIP=false
