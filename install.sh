@@ -139,7 +139,6 @@ $IMITATE_FDISK &&
 }
 
 #Copy LIB library into /usr/local/bin/fdisk
-#sed -i "s#^LIBRARY_HERE#$(cat $SCRIPT_DIR/LIB)#g" /usr/local/bin/fdisk ||
 sed -i "/^LIBRARY_HERE/{r$SCRIPT_DIR/LIB
 d
 }" /usr/local/bin/fdisk ||
@@ -158,7 +157,6 @@ then
 	}
 
 	#Check if root's $PATH contains /usr/local/bin
-	#sudo -i bash -c 'echo $PATH' | grep -q '/usr/local/bin' ||
 	su - -c 'echo $PATH' | grep -q '/usr/local/bin' ||
 	{
 		echo "WARNING: /usr/local/bin is NOT in your root's \$PATH"
