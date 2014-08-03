@@ -1,8 +1,22 @@
 #!/bin/bash
+
+#Path to fdisk binary
 FDISK_PATH=/sbin/fdisk
+
 #Comma seporated list of devices. Ex:
 #DEVICES_TO_SKIP='/dev/sda /dev/sdb'
 DEVICES_TO_SKIP=''
+
+#There are several cases where fdisk runs against partitions, rather than
+#disks. This script makes sure that this does NOT happen. The result is that
+#this script's output may be slightly different than real fdisk's output. If you
+#want the output to be exactly the same, set IMITATE_FDISK to true to disable
+#these extra checks
+IMITATE_FDISK=false
+
+#Exit Code. Changes automatically
+#depending on how real fdisk exits
+EXIT_CODE=0
 
 [[ -e $FDISK_PATH ]] ||
 { echo "$FDISK_PATH is not a valid path to fdisk. Modify $0 with the correct path."; exit 1; }
@@ -10,26 +24,29 @@ DEVICES_TO_SKIP=''
 #Remind user that they are not running fdisk directly
 echo "Running fdisk wrapper script"
 
+LIBRARY_HERE
+
 #If this script was run with any arguments other than "-l", pass the arguments
 #to real fdisk
 if [[ $# -ne 1 ]] || [[ $1 != "-l" ]]
 then
-	$FDISK_PATH $@
+	exec $FDISK_PATH $@
 else
-	which lsblk &>/dev/null ||
-	{ echo "WARNING: lsblk is required, but was not detected. Running regular fdisk"; $FDISK_PATH -l; exit 1; }
-
 	#Remind user that we are ignoring some disks
 	echo -n "Ignoring disks: "
 	[[ -z $DEVICES_TO_SKIP ]] && echo None || echo $DEVICES_TO_SKIP | sed 's/ /, /g'
 
 	#Run fdisk -l on all devices that are not on the ignore list
 	IFS=$'\n'
-	for DEVICE in $(lsblk -o KNAME,TYPE | grep 'disk$\|loop$\|dmraid$' | sort -u)
+	for DEVICE in $(get_list_of_devices)
 	do
-		DEVICE="/dev/$DEVICE"
-		DEVICE=$(echo $DEVICE | cut -d ' ' -f 1)
 		SKIP=false
+
+		#Real fdisk quietly ignores devices that it has no permissions to read
+		$IMITATE_FDISK &&
+		{
+			[[ -r $DEVICE ]] || continue
+		}
 
 		IFS=' '
 		for D in $DEVICES_TO_SKIP
@@ -44,6 +61,10 @@ else
 		if ! $SKIP
 		then
 			$FDISK_PATH -l $DEVICE
+			EC=$?
+			[[ $EC == 0 ]] || EXIT_CODE=$EC
 		fi
 	done
 fi
+
+exit $EXIT_CODE

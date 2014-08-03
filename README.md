@@ -6,9 +6,11 @@ disks you want it to
 
 Requirements:
 
-	fdisk and lsblk
-	Other than that, the scripts should pretty much be universal
-	They were tested on CentOS 7 and Debian 7, but are highly portable (in theory)
+	bash and fdisk
+	Other than that, the scripts should pretty much be universal, and use nothing that
+		even the most minimalistic embeded linux systems should have problems with
+	Both scripts were tested on CentOS 7, Debian 7, and Alpine but are highly portable
+		(in theory) and should work on most distros that fdisk works on
 
 Install:
 
