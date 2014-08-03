@@ -19,3 +19,9 @@ Install:
 Uninstall:
 
 	Delete /usr/local/bin/fdisk
+
+Configure After Installation:
+
+	If you want to change the devices that the wrapper script ignores without
+		reinstalling it, just edit /usr/local/bin/fdisk directly, and add
+		the devices to the DEVICES_TO_SKIP='' line (near the top of the file)
