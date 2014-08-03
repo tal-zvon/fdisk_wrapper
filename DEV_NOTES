@@ -6,15 +6,13 @@ since bash hashes executables when you run them, if you open a new terminal, run
 
 The exit code of the fdisk wrapper script is the same as the last, non-zero exit code of the 'fdisk -l $DEVICE' command
 	If anyone has a better idea for an exit code for the fdisk wrapper script, let me know
-Check how LVM logical volumes get handled
-	In imitate_fdisk mode - is it the same as regular fdisk?
-	In non imitate_fdisk mode - can I have it only show lvm disks if fdisk is new enough to handle LVM?
+
 Test code on:
 	CentOS
 	Debian
 	Alpine
+
 Add instructions for installing fdisk script manually in cases where install.sh fails
 	Ex. Embeded systems without tools like fmt, tput, and other small programs I don't test for
-Go over all the code before I merge into master
 
-ALWAYS MAKE SURE THAT IF YOU CHANGE get_list_of_devices IN ONE FILE (fdisk or install.sh), YOU DO IT IN THE OTHER TOO!
+Go over all the code before I merge into master
