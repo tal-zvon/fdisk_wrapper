@@ -8,6 +8,6 @@ The exit code of the fdisk wrapper script is the same as the last, non-zero exit
 	If anyone has a better idea for an exit code for the fdisk wrapper script, let me know
 
 Add instructions for installing fdisk script manually in cases where install.sh fails
-	Ex. Embeded systems without tools like fmt, tput, and other small programs I don't test for
+	Ex. Embeded systems without basic tools like dirname, which, id, and other small programs I don't test for
 
-Go over all the code before I merge into master
+If you run the script and it's already installed, ask if they want to remove it
