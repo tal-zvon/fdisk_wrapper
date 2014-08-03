@@ -28,6 +28,10 @@ uid=$(/usr/bin/id -u) && [ "$uid" = "0" ] ||
 [[ -e $SCRIPT_DIR/LIB ]] && . $SCRIPT_DIR/LIB ||
 { echo "LIB library not found"; exit 1; }
 
+#Check if /usr/local/bin exists
+[[ -d /usr/local/bin/ ]] || mkdir /usr/local/bin/ ||
+{ echo "Failed to create /usr/local/bin/"; exit 1; }
+
 clear
 echo "There are several cases where fdisk runs against partitions, rather than disks,
 which shows mostly useless output and clutters up your terminal. This script
