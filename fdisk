@@ -42,7 +42,7 @@ else
 	do
 		SKIP=false
 
-		#Real fdisk ignores devices that it has no permissions to read
+		#Real fdisk quietly ignores devices that it has no permissions to read
 		$IMITATE_FDISK &&
 		{
 			[[ -r $DEVICE ]] || continue
