@@ -121,7 +121,7 @@ echo
 cp -v $SCRIPT_DIR/fdisk /usr/local/bin/ &&
 chown -v root:root /usr/local/bin/fdisk &&
 chmod -v 755 /usr/local/bin/fdisk ||
-{ echo "Failed to install fdisk to /usr/local/bin/"; [[ -e /usr/local/bin/fdisk ]] && rm -f /usr/local/bin/fdisk exit 1; }
+{ echo "Failed to install fdisk to /usr/local/bin/"; [[ -e /usr/local/bin/fdisk ]] && rm -f /usr/local/bin/fdisk; exit 1; }
 
 #Modify fdisk's FDISK_PATH
 sed -i "s#^FDISK_PATH.*#FDISK_PATH=$FDISK_PATH#g" /usr/local/bin/fdisk ||
