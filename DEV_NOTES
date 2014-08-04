@@ -11,3 +11,10 @@ Add instructions for installing fdisk script manually in cases where install.sh 
 	Ex. Embeded systems without basic tools like dirname, which, id, and other small programs I don't test for
 
 If you run the script and it's already installed, ask if they want to remove it
+
+Add functionality to ignore by UUID
+	Only partitions have UUIDs - not drives
+	Either:
+		find out if there's a unique way to identiy hard drives
+		OR
+		let people put the UUID of any one of a drive's partitions to ignore the whole drive
