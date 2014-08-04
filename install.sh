@@ -38,12 +38,15 @@ echo "There are several cases where fdisk runs against partitions, rather than d
 which shows mostly useless output and clutters up your terminal. The fdisk
 wrapper script adds some additional checks to make sure that this does NOT
 happen. The result is that the wrapper script's output may be slightly
-different than real fdisk's output. Do you want the wrapper script to disable
-these additional checks and act exactly like fdisk (except the partitions
-you've ignored), even when fdisk is doing something dumb?"
+different than real fdisk's output."
+echo
+echo "Do you want the wrapper script to disable these additional checks and act
+exactly like fdisk (except the partitions you've ignored), even when fdisk is
+doing something dumb?"
 echo
 echo "Hint: Only say 'yes' if you understand the question, and have a good
 reason to do this"
+echo
 echo -n "Your answer [y/N]: "
 read answer
 
