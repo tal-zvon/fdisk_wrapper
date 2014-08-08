@@ -52,6 +52,16 @@ else
 	echo -n "Ignoring disks: "
 	[[ -z $DEVICES_TO_SKIP ]] && echo None || echo $DEVICES_TO_SKIP | sed 's/ /, /g'
 
+	#Show warning about GPT
+	$IMITATE_FDISK ||
+	{
+		$ENABLE_GDISK &&
+		{
+			echo "WARNING: The fdisk wrapper script ignores stderr, and the partition table type"
+			echo -e "\tinformation from the output of 'gdisk -l' for brevity"
+		}
+	}
+
 	#Run fdisk -l on all devices that are not on the ignore list
 	IFS=$'\n'
 	for DEVICE in $(get_list_of_devices)
@@ -76,9 +86,18 @@ else
 
 		if ! $SKIP
 		then
-			$FDISK_PATH -l $DEVICE
-			EC=$?
-			[[ $EC == 0 ]] || EXIT_CODE=$EC
+			GPT_TEST=$($FDISK_PATH -l $DEVICE 2>/dev/null | grep -q GPT && echo true || echo false)
+			if ! $IMITATE_FDISK && $ENABLE_GDISK && $GPT_TEST
+			then
+				echo
+				$GDISK_PATH -l $DEVICE 2>/dev/null | grep -A 100 'Disk /'
+				EC=$?
+				[[ $EC == 0 ]] || EXIT_CODE=$EC
+			else
+				$FDISK_PATH -l $DEVICE
+				EC=$?
+				[[ $EC == 0 ]] || EXIT_CODE=$EC
+			fi
 		fi
 	done
 fi
