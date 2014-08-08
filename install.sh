@@ -1,5 +1,7 @@
 #!/bin/bash
 FDISK_PATH=$(which fdisk)
+GDISK_PATH=$(which gdisk)
+ENABLE_GDISK=true
 DEVICES_TO_SKIP=''
 SCRIPT_DIR=$(dirname $(readlink -f $0))
 
@@ -122,6 +124,51 @@ done
 #If there were errors, exit
 $ERROR && exit 1
 
+#Check if gdisk exists
+$IMITATE_FDISK ||
+{
+	clear
+	if [[ -n $GDISK_PATH ]]
+	then
+		echo "Gdisk was found at $GDISK_PATH on your system."
+		echo "Would you like for devices that have a gpt partition table to be automatically"
+		echo "run through 'gdisk -l' instead of 'fdisk -l'?"
+		echo
+		echo -n "Your answer [Y/n]: "
+		read answer
+
+		#Convert answer to lowercase
+		#Note: We keep $lanswer separate from $answer on purpose
+		lanswer=$(echo $answer | tr "[:upper:]" "[:lower:]")
+
+		#Default to yes if variable is empty
+		if [ ! -n "$lanswer" ]
+		then
+			lanswer=y
+		fi
+
+		case "$lanswer" in
+			y|yes)
+				echo "gdisk enabled"
+				ENABLE_GDISK=true
+				;;
+			n|no)
+				echo "gdisk disabled"
+				ENABLE_GDISK=false
+				;;
+			*)
+				echo "'$answer' is not a valid answer"
+				echo "fdisk wrapper installation aborted"
+				exit 1
+				;;
+		esac
+	else
+		echo "Gdisk not found. If you would like to have devices with a gpt partition table"
+		echo "run through 'gdisk -l' instead of 'fdisk -l', install gdisk and rerun this"
+		echo "install.sh script"
+	fi
+}
+
 #########################
 #########INSTALL#########
 #########################
@@ -153,6 +200,17 @@ sed -i "/^LIBRARY_HERE/{r$SCRIPT_DIR/LIB
 d
 }" /usr/local/bin/fdisk ||
 { echo "Failed to replace LIBRARY_HERE with LIB library"; [[ -e /usr/local/bin/fdisk ]] && rm -f /usr/local/bin/fdisk; exit 1; }
+
+#Modify fdisk's GDISK_PATH and ENABLE_GDISK
+$IMITATE_FDISK ||
+{
+	$ENABLE_GDISK &&
+	{
+		sed -i "s#^ENABLE_GDISK.*#ENABLE_GDISK=true#g" /usr/local/bin/fdisk &&
+		sed -i "s#^GDISK_PATH.*#GDISK_PATH=$GDISK_PATH#g" /usr/local/bin/fdisk ||
+		echo "Failed to set IMITATE_FDISK variable on /usr/local/bin/fdisk"
+	}
+}
 
 #Check if sudo is on the system
 if which sudo &>/dev/null
