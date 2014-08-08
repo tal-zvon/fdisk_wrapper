@@ -28,10 +28,13 @@ EXIT_CODE=0
 [[ -e $FDISK_PATH ]] ||
 { echo "$FDISK_PATH is not a valid path to fdisk. Modify $0 with the correct path."; exit 1; }
 
-$ENABLE_GDISK &&
+$IMITATE_FDISK ||
 {
-	[[ -e $GDISK_PATH ]] ||
-	{ echo "$GDISK_PATH is not a valid path to gdisk. Modify $0 with the correct path."; exit 1; }
+	$ENABLE_GDISK &&
+	{
+		[[ -e $GDISK_PATH ]] ||
+		{ echo "$GDISK_PATH is not a valid path to gdisk. Modify $0 with the correct path."; exit 1; }
+	}
 }
 
 #Remind user that they are not running fdisk directly
