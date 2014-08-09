@@ -163,6 +163,8 @@ $IMITATE_FDISK ||
 				;;
 		esac
 	else
+		ENABLE_GDISK=false
+
 		echo "Gdisk not found. If you would like to have devices with a gpt partition table"
 		echo "run through 'gdisk -l' instead of 'fdisk -l', install gdisk and rerun this"
 		echo "install.sh script"
