@@ -3,6 +3,9 @@
 #Path to fdisk binary
 FDISK_PATH=/sbin/fdisk
 
+#Path to gdisk binary
+GDISK_PATH=/sbin/gdisk
+
 #Comma seporated list of devices. Ex:
 #DEVICES_TO_SKIP='/dev/sda /dev/sdb'
 DEVICES_TO_SKIP=''
@@ -14,12 +17,25 @@ DEVICES_TO_SKIP=''
 #these extra checks
 IMITATE_FDISK=false
 
+#Set to true if we want to run devices with a gpt partition table through
+#'gdisk -l' instead of 'fdisk -l'
+ENABLE_GDISK=false
+
 #Exit Code. Changes automatically
 #depending on how real fdisk exits
 EXIT_CODE=0
 
 [[ -e $FDISK_PATH ]] ||
 { echo "$FDISK_PATH is not a valid path to fdisk. Modify $0 with the correct path."; exit 1; }
+
+$IMITATE_FDISK ||
+{
+	$ENABLE_GDISK &&
+	{
+		[[ -e $GDISK_PATH ]] ||
+		{ echo "$GDISK_PATH is not a valid path to gdisk. Modify $0 with the correct path."; exit 1; }
+	}
+}
 
 #Remind user that they are not running fdisk directly
 echo "Running fdisk wrapper script"
@@ -35,6 +51,16 @@ else
 	#Remind user that we are ignoring some disks
 	echo -n "Ignoring disks: "
 	[[ -z $DEVICES_TO_SKIP ]] && echo None || echo $DEVICES_TO_SKIP | sed 's/ /, /g'
+
+	#Show warning about GPT
+	$IMITATE_FDISK ||
+	{
+		$ENABLE_GDISK &&
+		{
+			echo "WARNING: The fdisk wrapper script ignores stderr, and the partition table type"
+			echo -e "\tinformation from the output of 'gdisk -l' for brevity"
+		}
+	}
 
 	#Run fdisk -l on all devices that are not on the ignore list
 	IFS=$'\n'
@@ -60,9 +86,18 @@ else
 
 		if ! $SKIP
 		then
-			$FDISK_PATH -l $DEVICE
-			EC=$?
-			[[ $EC == 0 ]] || EXIT_CODE=$EC
+			GPT_TEST=$($FDISK_PATH -l $DEVICE 2>/dev/null | grep -q GPT && echo true || echo false)
+			if ! $IMITATE_FDISK && $ENABLE_GDISK && $GPT_TEST
+			then
+				echo
+				$GDISK_PATH -l $DEVICE 2>/dev/null | grep -A 100 'Disk /'
+				EC=$?
+				[[ $EC == 0 ]] || EXIT_CODE=$EC
+			else
+				$FDISK_PATH -l $DEVICE
+				EC=$?
+				[[ $EC == 0 ]] || EXIT_CODE=$EC
+			fi
 		fi
 	done
 fi
