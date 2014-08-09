@@ -1,6 +1,6 @@
 #!/bin/bash
-FDISK_PATH=$(which fdisk)
-GDISK_PATH=$(which gdisk)
+FDISK_PATH=$(which fdisk 2>/dev/null)
+GDISK_PATH=$(which gdisk 2>/dev/null)
 ENABLE_GDISK=true
 DEVICES_TO_SKIP=''
 SCRIPT_DIR=$(dirname $(readlink -f $0))
